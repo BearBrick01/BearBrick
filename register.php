@@ -20,9 +20,10 @@ require_once "connect.php";
         $Fname = $_POST['Fname'];
         $Lname = $_POST['Lname'];
         $Email = $_POST['Email'];
-        $Password = $_POST['Password'];
         $Username = $_POST['Username'];
-        $Password = md5($Password); 
+        // $Password = md5( $_POST['Password']);
+        // $Password = md5($Password); 
+        $Password = $_POST['Password'];
         
         $query = "INSERT INTO costomer (idcostomer,Fname,Lname,Email,Password,Username)
                   VALUES(null, '$Fname', '$Lname', '$Email', '$Password' ,'$Username')";  

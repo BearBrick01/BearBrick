@@ -10,7 +10,6 @@ require_once "connect.php";
 
   if (isset($_POST['Signin'])){
     $mysqli = new mysqli("localhost", "root", "", "bearbrick");
-    
 
       if(empty($_POST["Username"]) && empty($_POST["Password"])){  
         echo '<script>alert("Both Fields are required")</script>';  
@@ -18,22 +17,25 @@ require_once "connect.php";
       }else{ 
         $Username = $_POST['Username'];
         $Password = $_POST['Password'];
-        $Password2 = md5($Password);
-        $query = "SELECT * FROM costomer WHERE Username = '$Username' AND Password = '$Password2'";
+        // $Password = md5( $_POST['Password']);
+
+        $query = "SELECT * FROM costomer WHERE Username = '$Username' AND Password = '$Password'";
+        $query2 = "SELECT * FROM employee WHERE Username = '$Username' AND Password = '$Password'";
         $result=mysqli_query($conn,$query);
-    
+        $result2=mysqli_query($conn,$query2);
+         
           if (mysqli_num_rows($result) == 1) {
             $row = mysqli_fetch_array($result);
-            $_SESSION['Fname'] = $row['Fname'];
-            $_SESSION['Lname'] = $row['Lname'];
-            $_SESSION['Email'] = $row['Email'];
             $_SESSION['Username'] = $row['Username'];
-            $_SESSION['Password'] = $row['Password'];
-            $Password = md5($Password); 
-
-                header("Location: entry.php");
-              
-
+            header("Location: entry.php");
+          }else {
+            echo "<script>alert('Username or Password has wrong ');</script>";
+          }
+          
+          if (mysqli_num_rows($result2) == 1) {
+            $row = mysqli_fetch_array($result2);
+            $_SESSION['Username'] = $row['Username'];
+            header("Location: entry.php");
           }else {
             echo "<script>alert('Username or Password has wrong ');</script>";
           }
@@ -67,7 +69,7 @@ require_once "connect.php";
     <div class="card-body login-card-body">
     <p class="login-box-msg">Welcome to BearBrick House</p>
     
-      <form method="post">
+      <form name="formlogin" method="post" >
         <div class="input-group mb-3">
           <input type="text" class="form-control" id="Username" name="Username" placeholder="Username">
           <div class="input-group-append">
@@ -87,7 +89,7 @@ require_once "connect.php";
           <!-- /.col -->
           <div class="row">
             <div class="col-md-4 offset-md-4">
-                <a href="indexemployee.html"> <button type="submit" class="btn btn-primary btn-block" id="Signin" name="Signin">Sign In</button></a>
+                <button type="submit" class="btn btn-primary btn-block" id="Signin" name="Signin">Sign In</button>
             </div>
             <div class="col-6"></div>
             <div class="col-6"><a href="register.php" class="text-center"><small> Register a new membership </small></a></div> 
