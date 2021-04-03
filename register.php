@@ -9,27 +9,37 @@ require_once "connect.php";
     }
 
     if (isset($_POST['Register']) ){
-      $mysqli = new mysqli("localhost", "root", "", "bearbrick");
+      $mysqli = new mysqli("localhost", "root", "1111", "bear02");
      
-      if(empty($_POST["Fname"]) && empty($_POST["Lname"]) && empty($_POST["Email"]) && empty($_POST["Username"]) && empty($_POST["Username"]) )
+      if(empty($_POST["FirstName"]) && empty($_POST["LastName"]) && empty($_POST["EmailAddress"]) && empty($_POST["Username"]) && empty($_POST["Username"]) )
       {  
         echo '<script>alert("Fields are required")</script>';  
-
       }else{
-        
-        $Fname = $_POST['Fname'];
-        $Lname = $_POST['Lname'];
-        $Email = $_POST['Email'];
-        $Username = $_POST['Username'];
-        // $Password = md5( $_POST['Password']);
-        // $Password = md5($Password); 
-        $Password = $_POST['Password'];
-        
-        $query = "INSERT INTO costomer (idcostomer,Fname,Lname,Email,Password,Username)
-                  VALUES(null, '$Fname', '$Lname', '$Email', '$Password' ,'$Username')";  
-         mysqli_query($conn, $query);
-      }
-    }
+          
+           $Fname = $_POST['Fname'];
+           $Lname = $_POST['Lname'];
+           $Email = $_POST['Email'];
+           $Username = $_POST['Username'];
+           // $Password = md5( $_POST['Password']);
+           // $Password = md5($Password); 
+           $Password = $_POST['Password'];
+
+                
+          $query = "INSERT INTO customer (CustomerNumber,FirstName,LastName,EmailAddress,Password,Username)
+                    VALUES(null, '$Fname', '$Lname', '$Email', '$Password' ,'$Username')";  
+          $result = mysqli_query($conn, $query);
+
+             if ($result) {
+               $_SESSION['success'] = "Insert user successfully";
+               echo '<script>Register successfully")</script>';
+               header("Location:login.php");
+             } else {
+               $_SESSION['error'] = "Something went wrong";
+               header("Location: register.php");
+            }
+        }
+    } 
+    
     
 ?>
 <!DOCTYPE html>
@@ -37,7 +47,7 @@ require_once "connect.php";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BearBrick | Register</title>
+  <title>Bearbrick house | Register</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -48,11 +58,18 @@ require_once "connect.php";
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
-<body class="hold-transition login-page">
+
+<body class="hold-transition login-page" Style= "background-image: url('pics/BEARBRICK at Culture Cartel 2018 06.JPG');
+    background-size:100%;
+    align-content: center;"> 
 <div class="login-box">
-  <div class="login-logo">
-    <a href=""><img class="mr-3" src="logo.png"><b>BEARBRICK</b>House</a>
+  <div class="login-logo" >
+  <a href="index.php" >
+      <img class="brand-image img-circle elevation-3" src="pics/bearlogo.png"  Style ="width:15%" >
+      <b>BEARBRICK</b>    House
+    </a>
   </div>
+</div>
   <!-- /.login-logo -->
   <div class="card" style="width: 30rem">
     <div class="card-body register-card-body">
@@ -123,13 +140,19 @@ require_once "connect.php";
   </div><!-- /.card -->
 </div>
 <!-- /.register-box -->
+<footer class="main-footer">
+   
+  </footer>
+
 
 <!-- jQuery -->
-<script src="../../plugins/jquery/jquery.min.js"></script>
+<script src="../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
-<script src="../../dist/js/adminlte.min.js"></script>
+<script src="../dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="../dist/js/demo.js"></script>
 </body>
 </html>
 

@@ -4,12 +4,9 @@ session_start();
   
 require_once "connect.php";
 
-  if(isset($_SESSION["Username"])){  
-    header("Location:entry.php"); 
-  }
-
-  if (isset($_POST['Signin'])){
-    $mysqli = new mysqli("localhost", "root", "", "bearbrick");
+  if (isset($_POST['Login'])){
+    $mysqli = new mysqli("localhost", "root", "1111", "bear02");
+     
 
       if(empty($_POST["Username"]) && empty($_POST["Password"])){  
         echo '<script>alert("Both Fields are required")</script>';  
@@ -19,23 +16,27 @@ require_once "connect.php";
         $Password = $_POST['Password'];
         // $Password = md5( $_POST['Password']);
 
-        $query = "SELECT * FROM costomer WHERE Username = '$Username' AND Password = '$Password'";
-        $query2 = "SELECT * FROM employee WHERE Username = '$Username' AND Password = '$Password'";
-        $result=mysqli_query($conn,$query);
-        $result2=mysqli_query($conn,$query2);
-         
-          if (mysqli_num_rows($result) == 1) {
-            $row = mysqli_fetch_array($result);
+         $query1 = "SELECT * FROM customer WHERE Username = '$Username'  AND Password = '$Password'";
+         $query2 = "SELECT * FROM employee WHERE Username = '$Username' AND Password = '$Password'";
+         $result1 = mysqli_query($conn, $query1);
+         $result2=mysqli_query($conn,$query2);
+  
+        /* if (mysqli_num_rows($result1) == 1) {
+            $row = mysqli_fetch_array($result2);
             $_SESSION['Username'] = $row['Username'];
             header("Location: entry.php");
           }else {
             echo "<script>alert('Username or Password has wrong ');</script>";
-          }
+          }*/
           
-          if (mysqli_num_rows($result2) == 1) {
-            $row = mysqli_fetch_array($result2);
+          if (mysqli_num_rows($result1) == 1) {
+            $row = mysqli_fetch_array($result1);
+            $_SESSION['CustomerNumber'] = $row['CustomerNumber'];
             $_SESSION['Username'] = $row['Username'];
-            header("Location: entry.php");
+            $_SESSION['User'] = $row['FirstName'] . "  " . $row['LastName'];
+            $_SESSION['EmailAddress'] = $row['EmailAddress'];
+            $_SESSION['Phone'] = $row['Phone'];
+            header("Location:index2.php");
           }else {
             echo "<script>alert('Username or Password has wrong ');</script>";
           }
@@ -48,7 +49,7 @@ require_once "connect.php";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BearBrick | Login</title>
+  <title>Bearbrick house | Register</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -59,15 +60,22 @@ require_once "connect.php";
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
-<body class="hold-transition login-page">
+
+<body class="hold-transition login-page" Style= "background-image: url('pics/BEARBRICK at Culture Cartel 2018 06.JPG');
+    background-size:100%;
+    align-content: center;"> 
 <div class="login-box">
-  <div class="login-logo">
-      <a href=""><img class="mr-3" src="logo.png"><b>BEARBRICK</b>House</a>
+  <div class="login-logo" >
+  <a href="index.php" >
+      <img class="brand-image img-circle elevation-3" src="pics/bearlogo.png"  Style ="width:15%" >
+      <b>BEARBRICK</b>    House
+    </a>
   </div>
+
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-    <p class="login-box-msg">Welcome to BearBrick House</p>
+    <p class="login-box-msg">Welcome to Bearbrick House</p>
     
       <form name="formlogin" method="post" >
         <div class="input-group mb-3">
@@ -89,7 +97,7 @@ require_once "connect.php";
           <!-- /.col -->
           <div class="row">
             <div class="col-md-4 offset-md-4">
-                <button type="submit" class="btn btn-primary btn-block" id="Signin" name="Signin">Sign In</button>
+                <button type="submit" class="btn btn-primary btn-block" id="Login" name="Login">Login</button>
             </div>
             <div class="col-6"></div>
             <div class="col-6"><a href="register.php" class="text-center"><small> Register a new membership </small></a></div> 
