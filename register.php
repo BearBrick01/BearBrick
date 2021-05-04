@@ -2,34 +2,44 @@
 session_start();
 
 require_once "connect.php";
-
-
-    if(isset($_SESSION["Username"])){  
-        header("Location:entry.php");  
-    }
+if(isset($_SESSION['CustomerNumber']))  
+{  
+   header("Location:logout.php"); 
+} 
 
     if (isset($_POST['Register']) ){
-      $mysqli = new mysqli("localhost", "root", "", "bearbrick");
+      $mysqli = new mysqli("localhost", "root", "", "database");
      
-      if(empty($_POST["Fname"]) && empty($_POST["Lname"]) && empty($_POST["Email"]) && empty($_POST["Username"]) && empty($_POST["Username"]) )
+      if(empty($_POST["FirstName"]) && empty($_POST["LastName"]) && empty($_POST["EmailAddress"]) && empty($_POST["Username"]) && empty($_POST["Username"]) )
       {  
         echo '<script>alert("Fields are required")</script>';  
-
       }else{
-        
-        $Fname = $_POST['Fname'];
-        $Lname = $_POST['Lname'];
-        $Email = $_POST['Email'];
-        $Username = $_POST['Username'];
-        // $Password = md5( $_POST['Password']);
-        // $Password = md5($Password); 
-        $Password = $_POST['Password'];
-        
-        $query = "INSERT INTO costomer (idcostomer,Fname,Lname,Email,Password,Username)
-                  VALUES(null, '$Fname', '$Lname', '$Email', '$Password' ,'$Username')";  
-         mysqli_query($conn, $query);
-      }
-    }
+          
+           $Fname = $_POST['Fname'];
+           $Lname = $_POST['Lname'];
+           $Email = $_POST['Email'];
+           $Username = $_POST['Username'];
+           // $Password = md5( $_POST['Password']);
+           // $Password = md5($Password); 
+           $Password = $_POST['Password'];
+           $Phone = $_POST['Phone'];
+
+                
+          $query = "INSERT INTO customer (CustomerNumber,FirstName,LastName,EmailAddress,Password,Username,Phone)
+                    VALUES(null, '$Fname', '$Lname', '$Email', '$Password' ,'$Username','$Phone')";  
+          $result = mysqli_query($conn, $query);
+          echo $query;
+             if ($result) {
+               $_SESSION['success'] = "Insert user successfully";
+               echo '<script>Register successfully")</script>';
+               header("Location:login.php");
+             } else {
+               $_SESSION['error'] = "Something went wrong";
+               header("Location: register.php");
+            }
+        }
+    } 
+    
     
 ?>
 <!DOCTYPE html>
@@ -37,7 +47,7 @@ require_once "connect.php";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BearBrick | Register</title>
+  <title>Bearbrick house | Register</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -47,15 +57,25 @@ require_once "connect.php";
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap" rel="stylesheet">
+
 </head>
-<body class="hold-transition login-page">
+
+<body class="hold-transition login-page" Style= "background-image: url('pics/bg9.jpg');
+    background-size:100%;
+    align-content: center;"> 
 <div class="login-box">
-  <div class="login-logo">
-    <a href=""><img class="mr-3" src="logo.png"><b>BEARBRICK</b>House</a>
+  <div class="login-logo" >
+  <a href="index.php" >
+      <img class="brand-image img-circle elevation-3" src="pics/bearlogo.png"  Style ="width:15%" ><br>
+      <span style="font-size: 50pt;font-family: 'Reenie Beanie', cursive;font-weight:1000;color:#f2fff6;text-shadow: 2px 2px black">Bearbrick House</span>
+    </a>
   </div>
+</div>
   <!-- /.login-logo -->
-  <div class="card" style="width: 30rem">
-    <div class="card-body register-card-body">
+  <div class="card" style="width: 30rem;opacity:0.95">
+    <div class="card-body register-card-body"  >
       <p class="login-box-msg">Register a new membership</p>
 
       <form method="post">
@@ -90,6 +110,14 @@ require_once "connect.php";
           </div>
         </div>
         <div class="input-group mb-3">
+          <input type="text" class="form-control" id="Phone" name="Phone"  placeholder="Phone">
+          <div class="input-group-append">
+            <div class="input-group-text">
+            <span class="fas fa-phone"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
           <input type="text" class="form-control" id="Username" name="Username" placeholder="Username">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -106,6 +134,7 @@ require_once "connect.php";
           </div>
           <small id="password" class="form-text text-muted"> Make sure it's at least 8 characters including a number and a lowercase letter.</small>
         </div>
+   
           <!-- /.col -->
           <div class="row">
             <div class="col-md-4 offset-md-4">
@@ -123,13 +152,18 @@ require_once "connect.php";
   </div><!-- /.card -->
 </div>
 <!-- /.register-box -->
+<footer class="main-footer">
+   
+  </footer>
+
 
 <!-- jQuery -->
-<script src="../../plugins/jquery/jquery.min.js"></script>
+<script src="../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
-<script src="../../dist/js/adminlte.min.js"></script>
+<script src="../dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="../dist/js/demo.js"></script>
 </body>
 </html>
-
