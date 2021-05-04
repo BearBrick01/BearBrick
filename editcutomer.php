@@ -1,40 +1,96 @@
 <?php
 session_start();
-  
-require_once "connect.php";
-if(!isset($_SESSION["Username"])){  
-    header("Location:index.php"); 
-  }
- 
-  if (isset($_POST['submit'])) {
-    $mysqli = new mysqli("localhost", "root", "1111", "bear02");
-    $old_username = $_POST['usertest'];
-    $Firstname = $_POST['Fname'];
-    $Lastname = $_POST['Lname'];
-    $Username = $_POST['Username'];
-    $Email = $_POST['Email'];
-    $Password= $_POST['Password'];
-    $Phone= $_POST['Phone'];
- 
-    $query1 = "UPDATE customer  SET FirstName='$Firstname', LastName=' $Lastname',  EmailAddress='$Email',
-                               Username='$Username', Password='$Password',  Phone='$Phone',  
-                               WHERE Username = '$old_username'";                       
-                            
-            
-   $result1 = mysqli_query($conn, $query1);
-  
-  echo $_SESSION['Phone'];
+require_once("../connect.php");
 
-  }
-	
-   
+if(!isset($_SESSION['CustomerNumber']))  
+{  
+   echo "Please Login!";
+   exit();
+   header("Location:../login.php"); 
+} 
+//*** Update Last Stay in Login System
+$sql = "UPDATE customer SET ModifiedDate = NOW() WHERE CustomerNumber = '".$_SESSION['CustomerNumber']."' ";
+$query = mysqli_query($conn,$sql);
+//*** Get User Login
+$strSQL = "SELECT * FROM customer WHERE CustomerNumber = '".$_SESSION['CustomerNumber']."' ";
+$objQuery = mysqli_query($conn,$strSQL);
+$objResult = mysqli_fetch_array($objQuery); 
+
+if (isset($_POST['submit'])) {
+ 
+  $conn = mysqli_connect("localhost", "root", "1111", "bear02");
+  $old_username = $_POST['usertest'];
+  $Firstname = $_POST['Firstname'];
+  $Lastname = $_POST['Lastname'];
+  $Username = $_POST['Username'];
+  $Email = $_POST['EmailAddress'];
+  $Password= $_POST['Password'];
+  $Phone= $_POST['Phone'];
+
+ $query1 = "UPDATE customer SET FirstName='$Firstname',LastName='$Lastname',EmailAddress='$Email',
+                             Username='$Username', Password='$Password',Phone='$Phone'
+                             WHERE CustomerNumber = '$old_username'";                       
+$result1 = mysqli_query($conn, $query1);
+
+$strSQL = "SELECT * FROM customer WHERE CustomerNumber = '".$_SESSION['CustomerNumber']."' ";
+$objQuery = mysqli_query($conn,$strSQL);
+$objResult = mysqli_fetch_array($objQuery); 
+}
+
+//*** address
+$strSQL3 = "SELECT * FROM address WHERE Username LIKE '".$objResult["Username"]."' ";
+$objQuery3 = mysqli_query($conn,$strSQL3);
+
+
+if (isset($_POST['submitADD'])) {
+
+  $Address = $_POST['Address'];
+  $City = $_POST['City'];
+  $StateProvince = $_POST['StateProvince'];
+  $CountryRegion = $_POST['CountryRegion'];
+  $PostalCode = $_POST['PostalCode'];
+  $Username = $_POST['Username'];
+
+    echo $CountryRegion;
+    echo $PostalCode;
+    echo $City;
+$query4 = "UPDATE address SET AddressLine1='$Address',City='$City',StateProvince='$StateProvince',
+                             CountryRegion='$CountryRegion',PostalCode='$PostalCode,Username='$Username'";                       
+$result4 = mysqli_query($conn, $query4);
+echo $query4;
+
+$query2 = "INSERT INTO address (AddressNumber,Username,AddressLine1,City,StateProvince,CountryRegion,PostalCode)
+VALUES(null,'$Username','$Address','$City','$StateProvince','$CountryRegion','$PostalCode')";  
+$result = mysqli_query($conn, $query2);
+
+$strSQL3 = "SELECT * FROM address WHERE Username LIKE '".$objResult["Username"]."' ";
+$objQuery3 = mysqli_query($conn,$strSQL3);
+}
+
+if (isset($_POST['subdelete'])) {
+
+  $conn = mysqli_connect("localhost", "root", "1111", "bear02");
+  $deleteid = $_POST['deleteid'];
+
+  /*$strSQL = "SELECT * FROM address WHERE AddressNumber LIKE '$deleteid' ";
+  $objQuery4 = mysqli_query($conn,$strSQL);*/
+  // echo $deleteid;
+
+  $qry = "DELETE FROM address WHERE AddressNumber = '$deleteid' ";
+  mysqli_query($conn,$qry);
+  echo  $qry;
+
+  $strSQL3 = "SELECT * FROM address WHERE Username LIKE '".$objResult["Username"]."' ";
+  $objQuery3 = mysqli_query($conn,$strSQL3);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bearbtick house </title>
+  <title>Bearbrick House </title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
   <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -43,11 +99,14 @@ if(!isset($_SESSION["Username"])){
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
   <!-- IonIcons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+      <!--font-->
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap" rel="stylesheet">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -67,7 +126,6 @@ if(!isset($_SESSION["Username"])){
       </li>
     </ul>
     
-
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
       <div class="input-group input-group-sm">
@@ -79,7 +137,6 @@ if(!isset($_SESSION["Username"])){
         </div>
       </div>
     </form>
-
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto" style="padding-right: 35pt;">
       <!-- Category Dropdown Menu -->
@@ -141,104 +198,61 @@ if(!isset($_SESSION["Username"])){
   </nav>
   <!-- /.navbar -->
 
-<!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-light-primary elevation-4">
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-light-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index2.php" class="brand-link">
-      <img src="pics/bearlogo.png" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span style="font-size: 20pt">Bearbrick House </span>
-      <br>
-      <span class="brand-text font-weight-light" style="font-size: 10pt">Database Management System </span>
+    <a href="../index2.php" class="brand-link">
+    <img src="../pics/bearlogo.png"class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span style="font-size: 20pt;font-family: 'Reenie Beanie', cursive;">Bearbrick House </span>
+        <br>
+        <!-- <span class="brand-text font-weight-light" style="font-size: 10pt">Database Management System </span> -->
     </a>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar user panel (optional) -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-         <!-- <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> -->
-        </div>
-
-        <div class="info">
-          <a href="editcutomer.php" class="d-block"><?php echo $_SESSION['Username']; ?></a>
-          <i><p style="padding-left:150px">
-            <a href="logout.php" class="d-block">Logout</a>
-            </p></i>
+  
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+          <div class="image">
+           <!-- <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> -->
           </div>
-        </div>
-      
-     
-         <!-- Sidebar Menu -->
-         <nav class="mt-2">
+  
+          <div class="info">
+          <a href="editcutomer.php" class="d-block"><?php echo $objResult["Username"];?></a>
+          <i><p style="padding-left:150px">
+              <a href="../login.php" class="d-block">Logout</a>
+              </p></i>
+            </div>
+          </div>
+        
+        <!-- Sidebar Menu -->
+ <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
             
             <li class="nav-header"></li>
             <li class="nav-item">
-              <a href="pages/productline.php" class="nav-link">
-                <i class="nav-icon fas fa-calendar-alt"></i>
+              <a href="productlinecustomer.php" class="nav-link">
+                <i class="nav-icon far fas fa-store"></i>
                 <p>
                   Product
                 </p>
               </a>
             </li>
+            <br>
+    
             <li class="nav-item">
-              <a href="pages/e-commerce.php" class="nav-link">
-                <i class="nav-icon fas fa-calendar-alt"></i>
-                <p>
-                  Product Detail
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="pages/productline.php" class="nav-link">
-                <i class="nav-icon far fa-image"></i>
-                <p>
-                  Add Product
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="pages/productstatus.php" class="nav-link">
-                <i class="nav-icon far fa-image"></i>
-                <p>
-                  Product Status
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="pages/cart.php" class="nav-link">
-                <i class="nav-icon fas fa-columns"></i>
+              <a href="cartcustomer.php" class="nav-link">
+              <i class="nav-icon far fas fa-shopping-cart"></i>
                 <p>
                  Cart
                 </p>
               </a>
             </li>
-            <li class="nav-item">
-              <a href="pages/order.php" class="nav-link">
-                <i class="nav-icon fas fa-columns"></i>
-                <p>
-                 Order
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="pages/employee.php" class="nav-link">
-                <i class="nav-icon fas fa-columns"></i>
-                <p>
-                 Employees
-                </p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="pages/customer.php" class="nav-link">
-                <i class="nav-icon fas fa-columns"></i>
-                <p>
-                 Customers
-                </p>
-              </a>
-            </li>
+            <br>
+            
+           
            
               </ul>
             </li>
@@ -248,7 +262,6 @@ if(!isset($_SESSION["Username"])){
       </div>
       <!-- /.sidebar -->
     </aside>
-
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper" style="min-height: 2343.6px;">
     <!-- Content Header (Page header) -->
@@ -271,28 +284,17 @@ if(!isset($_SESSION["Username"])){
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
                 <div class="text-center">
-                  <img class="profile-user-img img-fluid img-circle" src="pics/logo.png" alt="User profile picture">
+                  <img class="profile-user-img img-fluid img-circle" src="../pics/bearlogo.png" alt="User profile picture">
                 </div>
 
-                <h3 class="profile-username text-center"><?php echo $_SESSION['Username']; ?></h3>
+                <h3 class="profile-username text-center"><?php echo $objResult["Username"];?></h3>
 
                 <p class="text-muted text-center">Classic Member</p>
 
-                  <!--  <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">
-                    <b>Name : </b><?php echo $_SESSION['user']; ?>
-                  </li>
-                  <li class="list-group-item">
-                    <b>E-mail : </b> <?php echo $_SESSION['EmailAddress']; ?>
-                  </li>
-                  <li class="list-group-item">
-                    <b>Phone :</b><?php echo $_SESSION['Phone']; ?>
-                  </li>
-                </ul>-->
               </div> 
             </div>
             <!-- /.card -->
-</div>
+         </div>
           <!-- /.col -->
           <div class="col-md-9">
             <div class="card">
@@ -309,18 +311,18 @@ if(!isset($_SESSION["Username"])){
                         <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item">
                             <b>Name : </b>
-                            <a><?php echo $_SESSION['User']; ?></a>
+                            <a><?php echo $objResult["FirstName"];?></a><a><?php echo $objResult["LastName"];?></a>
                         </li>
                         <li class="list-group-item">
                             <b>E-mail : </b> 
-                            <a ><?php echo $_SESSION['EmailAddress']; ?></a>
+                            <a><?php echo $objResult["EmailAddress"];?></a>
                         </li>
                         <li class="list-group-item">
                             <b>Phone :</b>
-                            <a ><?php echo $_SESSION['Phone']; ?></a>
+                            <a><?php echo $objResult["Phone"];?></a>
                         </li>
                         </ul>
-                        <div class="row">
+                              <div class="row">
                                 <div class="col-sm-2 offset-sm-10">
                                 <a class="btn btn-primary btn-danger"class="nav-link" href="#settings" data-toggle="tab"name="Edit">Edit<a>
                                 </div>
@@ -331,22 +333,77 @@ if(!isset($_SESSION["Username"])){
                         <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item">
                             <b>Name : </b>
-                            <a><?php echo $_SESSION['User']; ?></a>
-                            <a><?php echo $_SESSION['Address']; ?></a>
+                            <a><?php echo $objResult["FirstName"];?></a><a><?php echo $objResult["LastName"];?></a>
                         </li>
+                        <li class="list-group-item">
+                            <b>Address : </b>
+                        <?php
+                  
+                  while($objResult3 = mysqli_fetch_array($objQuery3) )
+                  {
+                  ?>  
                         
+                        <a>
+                        <?php
+                        if( $objResult3== Null ){
                         
+                             echo ' ';
+                      
+                        } 
+                        
+                        else {
+                        
+                            // echo $objResult3["AddressNumber"];
+                             echo $objResult3["AddressLine1"];
+                             echo $objResult3["City"];
+                             echo $objResult3["StateProvince"];
+                             echo $objResult3["CountryRegion"];
+                             echo $objResult3["PostalCode"];
+                      
+                        } ?>
+                       <div class="row">
+                        <div class="col-sm-2 offset-sm-10">
+                        <form method="post">
+                        <input name ="deleteid" type="text" value="<?php  echo $objResult3["AddressNumber"]; ?>"hidden>
+                        <button type="submit" class="btn pull-right" name ="subdelete"><i class="fa fa-trash" style="font-size:15px;color:#FF6347;"></i></button>
+                      
+                        </from>
+                        </div>
+                        </div>
+                        
+                        </a>
+                        </li>
+                        <?php
+                        }
+                        ?>
                         </ul>
+                              <div class="row">
+                                <div class="col-sm-2 offset-sm-10">
+                                <a class="btn btn-primary btn-danger"class="nav-link" href="#settingsAdd" data-toggle="tab"name="EditAdd">Edit<a>
+                                </div>
+                              </div>
+                             
+                  </div>
+                  <!-- /.tab-pane -->
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="Address">
+                        <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item"></li>
+                        <li class="list-group-item">
+                         <a></a>
+                        </li>
+                        </ul>
+                             
                   </div>
                   <!-- /.tab-pane -->
 
                   <div class="tab-pane" id="settings">
                   <form method="post">
-                  <label for="Profile setting" class="col-sm-2 col-form-label">Profile Settig</label>
+                  <label for="Profile setting" class="col-sm-2 col-form-label">Profile Setting</label>
                             <div class="form-row">
                                 <div class="col"> 
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control" id="Fname" name="Fname" placeholder="Fristname">
+                                        <input type="text" class="form-control" id="Fname" name="Firstname" placeholder="Fristname">
                                         <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>
@@ -356,7 +413,7 @@ if(!isset($_SESSION["Username"])){
                                 </div>
                                 <div class="col"> 
                                     <div class="input-group mb-3">
-                                        <input type="text" class="form-control" mid="Lname" name="Lname"  placeholder="Lastname">
+                                        <input type="text" class="form-control" mid="Lname" name="Lastname"  placeholder="Lastname">
                                         <div class="input-group-append">
                                         <div class="input-group-text">
                                             <span class="fas fa-user"></span>
@@ -368,7 +425,7 @@ if(!isset($_SESSION["Username"])){
                             <div class="form-row">
                               <div class="col"> 
                                 <div class="input-group mb-3">
-                                  <input type="email" class="form-control" id="Email" name="Email"  placeholder="Email">
+                                  <input type="email" class="form-control" id="Email" name="EmailAddress"  placeholder="Email">
                                   <div class="input-group-append">
                                       <div class="input-group-text">
                                         <span class="fas fa-envelope"></span>
@@ -413,7 +470,7 @@ if(!isset($_SESSION["Username"])){
                              
                               <div class="row">
                                 <div class="col-sm-2 offset-sm-10">
-                                  <input type="text" id="usertest" name="usertest" value="<?php echo $_SESSION['Username']; ?>" hidden>
+                                  <input type="text" id="usertest" name="usertest" value="<?php echo $objResult["CustomerNumber"];?>" hidden>
                                   <button type="submit" class="btn btn-primary btn-danger" id="submit" name="submit">submit</button>
                                 </div>
                               </div>
@@ -421,7 +478,76 @@ if(!isset($_SESSION["Username"])){
                               <!-- /.col -->
                     </form>
                   </div>
+                   <!-- /.tab-pane -->
+                   <div class="tab-pane" id="Address">
+                        <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item"></li>
+                        <li class="list-group-item">
+                         <a></a>
+                        </li>
+                        </ul>
+                             
+                  </div>
                   <!-- /.tab-pane -->
+
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="settingsAdd">
+                  <form method="post">
+                  <label for="Profile setting" class="col-sm-2 col-form-label">Address Setting</label>
+                            <div class="form-row">
+                                <div class="col"> 
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" id="Address" name="Address" placeholder="Address">
+                                      <!--  <div class="input-group-append">
+                                        <div class="input-group-text">
+                                            <span class="fas fa-user"></span>
+                                        </div>
+                                        </div>-->
+                                    </div>
+                                </div>
+                  
+                            </div>
+                            <div class="form-row">
+                              <div class="col"> 
+                                <div class="input-group mb-3">
+                                  <input type="text" class="form-control" id="City" name="City"  placeholder="City">
+                                  
+                                </div>
+                              </div>
+                              <div class="col"> 
+                                <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="StateProvince" name="StateProvince"  placeholder="StateProvince">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-row">
+                              <div class="col"> 
+                                <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="CountryRegion" name="CountryRegion"  placeholder="CountryRegion">
+                                  
+                                </div>
+                              </div>
+                              <div class="col"> 
+                                <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="PostalCode" name="PostalCode"  placeholder="PostalCode">
+                                 
+                                </div>
+                              </div>
+                            </div>
+                              <!-- /.col -->
+                             
+                              <div class="row">
+                                <div class="col-sm-2 offset-sm-10">
+                                  <input type="text" id="username" name="Username" value="<?php echo $objResult["Username"];?>" hidden>
+                                  <button type="submit" class="btn btn-primary btn-danger" id="submitADD" name="submitADD">submit</button>
+                                </div>
+                              </div>
+                              
+                              <!-- /.col -->
+                    </form>
+                  </div>
+              <!----จบ-->
+
                 </div>
                 <!-- /.tab-content -->
               </div><!-- /.card-body -->
@@ -435,6 +561,39 @@ if(!isset($_SESSION["Username"])){
     </section>
     <!-- /.content -->
   </div>
-<?php
-require 'template/customer/footer.php';
-?>
+  <!-- /.content-wrapper -->
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-white">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+
+  <!-- Main Footer -->
+  
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script src="../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE -->
+<script src="../dist/js/adminlte.js"></script>
+
+<!-- OPTIONAL SCRIPTS -->
+<script src="../plugins/chart.js/Chart.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="../dist/js/demo.js"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="../dist/js/pages/dashboard3.js"></script>
+
+<script var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+  return new bootstrap.Dropdown(dropdownToggleEl)
+})></script>
+
+</body>
+</html>
